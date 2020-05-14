@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useEffect, useState, useReducer, useRef } from "react";
 import "./App.css";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import StateContext from "./StateContext";
+import StateContext from "./stateContext";
 
 function App() {
   const [yourID, setYourID] = useState("");
@@ -125,9 +125,41 @@ function App() {
     peer.signal(callerSignal);
   };
 
+  const UserVideo = () => {
+    return <video playsInline ref={userVideo} autoPlay />;
+  };
+
+  console.log({ stream });
+
+  const PartnerVideo = () => {
+    return <video playsInline ref={partnerVideo} autoPlay />;
+  };
+
+  let IncomingCall = () => {
+    return (
+      <div>
+        <h1>{caller} is calling you</h1>
+        <button onClick={acceptCall}>Accept</button>
+      </div>
+    );
+  };
+
   return (
     <div className="App">
-      <h1>hello world</h1>
+      <h1>hai</h1>
+      <div className="videos">
+        {stream && <UserVideo />}
+        {callAccepted && <PartnerVideo />}
+      </div>
+      <div className="users">
+        {Object.keys(users).map((key) => {
+          if (key === yourID) {
+            return null;
+          }
+          return <button onClick={() => callPeer(key)}>Cal {key}</button>;
+        })}
+      </div>
+      {receivingCall && <IncomingCall />}
     </div>
   );
 }
