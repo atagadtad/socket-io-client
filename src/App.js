@@ -50,7 +50,7 @@ function App() {
   const socket = useRef();
 
   useEffect(() => {
-    socket.current = io.connect("/");
+    socket.current = io("http://localhost:3001");
     navigator.mediaDevices
       .getUserMedia({
         video: true,
@@ -126,10 +126,8 @@ function App() {
   };
 
   const UserVideo = () => {
-    return <video playsInline ref={userVideo} autoPlay />;
+    return <video playsInline muted ref={userVideo} autoPlay />;
   };
-
-  console.log({ stream });
 
   const PartnerVideo = () => {
     return <video playsInline ref={partnerVideo} autoPlay />;
@@ -143,6 +141,8 @@ function App() {
       </div>
     );
   };
+
+  console.log({ users });
 
   return (
     <div className="App">
