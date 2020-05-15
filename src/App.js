@@ -2,12 +2,12 @@ import React, { useEffect, useState, useReducer, useRef } from "react";
 import "./App.css";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import StateContext from "./stateContext";
+// import StateContext from "./stateContext";
 
 function App() {
   const [yourID, setYourID] = useState("");
   const [users, setUsers] = useState({});
-  const [stream, setStream] = useState(null);
+  const [webcamStream, setStream] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
 
   const initialStates = {
@@ -50,17 +50,20 @@ function App() {
   const socket = useRef();
 
   useEffect(() => {
-    socket.current = io("http://localhost:3001");
+    socket.current = io("https://socket-video-atags.herokuapp.com/");
+    // socket.current = io("http://localhost:8000");
+
     navigator.mediaDevices
       .getUserMedia({
         video: true,
         audio: true,
       })
-      .then((stream) => {
-        setStream(stream);
-        if (userVideo.current) {
-          userVideo.current.srcObject = stream;
-        }
+      .then((webcamStream) => {
+        setStream(webcamStream);
+        // console.log({ webcamStream });
+        // if (userVideo.current) {
+        userVideo.current.srcObject = webcamStream;
+        // }
       });
 
     socket.current.on("yourID", (id) => {
@@ -75,11 +78,14 @@ function App() {
     });
   }, []);
 
+  /**
+   * call a user
+   */
   const callPeer = (id) => {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: stream,
+      stream: webcamStream,
     });
 
     peer.on("signal", (data) => {
@@ -91,9 +97,12 @@ function App() {
     });
 
     peer.on("stream", (stream) => {
-      if (partnerVideo.current) {
-        partnerVideo.current.srcObject = stream;
-      }
+      // if (partnerVideo.current) {
+      partnerVideo.current.srcObject = stream;
+      userVideo.current.srcObject = webcamStream;
+      console.log("partnerVideo:", partnerVideo);
+      console.log("userVideo:", userVideo);
+      // }
     });
 
     socket.current.on("callAccepted", (signal) => {
@@ -102,13 +111,16 @@ function App() {
     });
   };
 
+  /**
+   * accept incoming call
+   */
   const acceptCall = () => {
     setCallAccepted(true);
 
     const peer = new Peer({
       initiator: false,
       tricle: false,
-      stream: stream,
+      stream: webcamStream,
     });
 
     peer.on("signal", (data) => {
@@ -130,7 +142,7 @@ function App() {
   };
 
   const PartnerVideo = () => {
-    return <video playsInline ref={partnerVideo} autoPlay />;
+    return <video playsInline muted ref={partnerVideo} autoPlay />;
   };
 
   let IncomingCall = () => {
@@ -142,24 +154,47 @@ function App() {
     );
   };
 
-  console.log({ users });
+  const usersList = Object.keys(users).map((key) => {
+    if (key === yourID) {
+      return null;
+    }
+    return (
+      <button key={key} onClick={() => callPeer(key)}>
+        Call {key}
+      </button>
+    );
+  });
+
+  // console.log({ currentStates });
+
+  // useEffect(() => {
+  //   if (userVideo.current !== undefined) {
+  //     console.log(userVideo.current.srcObject);
+  //   }
+  // }, [userVideo.current]);
+
+  // useEffect(() => {
+  //   if (partnerVideo.current !== undefined) {
+  //     console.log(partnerVideo.current.srcObject);
+  //   }
+  // }, [partnerVideo.current]);
+
+  // console.log({ userVideo, partnerVideo });
 
   return (
     <div className="App">
-      <h1>hai</h1>
       <div className="videos">
-        {stream && <UserVideo />}
-        {callAccepted && <PartnerVideo />}
+        <div>
+          <h1>ME:</h1>
+          {webcamStream && <UserVideo />}
+        </div>
+        <div>
+          <h1>OTHER:</h1>
+          {callAccepted && <PartnerVideo />}
+        </div>
       </div>
-      <div className="users">
-        {Object.keys(users).map((key) => {
-          if (key === yourID) {
-            return null;
-          }
-          return <button onClick={() => callPeer(key)}>Cal {key}</button>;
-        })}
-      </div>
-      {receivingCall && <IncomingCall />}
+      <div className="users">{usersList}</div>
+      <div>{receivingCall && <IncomingCall />}</div>
     </div>
   );
 }
