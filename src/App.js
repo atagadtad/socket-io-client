@@ -8,6 +8,7 @@ function App() {
   const [yourID, setYourID] = useState("");
   const [users, setUsers] = useState({});
   const [webcamStream, setStream] = useState();
+  const [partnerStream, setPartnerStream] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
 
   const initialStates = {
@@ -85,8 +86,11 @@ function App() {
     if (userVideo.current) {
       userVideo.current.srcObject = webcamStream;
     }
+    if (partnerVideo.current) {
+      partnerVideo.current.srcObject = partnerStream;
+    }
     // eslint-disable-next-line
-  }, [users, receivingCall, caller, callerSignal]);
+  }, [users, receivingCall, caller, callerSignal, callAccepted]);
 
   /**
    * call a user
@@ -108,9 +112,9 @@ function App() {
 
     peer.on("stream", (stream) => {
       if (partnerVideo.current) {
+        console.log("callingPeer partnerVideo");
         partnerVideo.current.srcObject = stream;
         // userVideo.current.srcObject = webcamStream;
-        console.log("callPeer: ", { partnerVideo });
       }
     });
 
@@ -140,7 +144,10 @@ function App() {
     });
 
     peer.on("stream", (stream) => {
-      partnerVideo.current.srcObject = stream;
+      setPartnerStream(stream);
+      // console.log({ stream });
+      // partnerVideo.current.srcObject = stream;
+      // console.log(partnerVideo.current);
       // userVideo.current.srcObject = webcamStream;
     });
 
