@@ -58,12 +58,11 @@ function App() {
         video: true,
         audio: true,
       })
-      .then((webcamStream) => {
-        setStream(webcamStream);
-        // console.log({ webcamStream });
-        // if (userVideo.current) {
-        userVideo.current.srcObject = webcamStream;
-        // }
+      .then((stream) => {
+        setStream(stream);
+        if (userVideo.current) {
+          userVideo.current.srcObject = stream;
+        }
       });
 
     socket.current.on("yourID", (id) => {
@@ -77,6 +76,17 @@ function App() {
       handleReceivingCall(data);
     });
   }, []);
+
+  /**
+   * when setUsers was called, the state of webcamStream was referred from its initial state
+   * so I have this useEffect below to set the ref to the current webcamStream state
+   */
+  useEffect(() => {
+    if (userVideo.current) {
+      userVideo.current.srcObject = webcamStream;
+    }
+    // eslint-disable-next-line
+  }, [users, receivingCall, caller, callerSignal]);
 
   /**
    * call a user
@@ -97,12 +107,11 @@ function App() {
     });
 
     peer.on("stream", (stream) => {
-      // if (partnerVideo.current) {
-      partnerVideo.current.srcObject = stream;
-      userVideo.current.srcObject = webcamStream;
-      console.log("partnerVideo:", partnerVideo);
-      console.log("userVideo:", userVideo);
-      // }
+      if (partnerVideo.current) {
+        partnerVideo.current.srcObject = stream;
+        // userVideo.current.srcObject = webcamStream;
+        console.log("callPeer: ", { partnerVideo });
+      }
     });
 
     socket.current.on("callAccepted", (signal) => {
@@ -119,7 +128,7 @@ function App() {
 
     const peer = new Peer({
       initiator: false,
-      tricle: false,
+      trickle: false,
       stream: webcamStream,
     });
 
@@ -132,6 +141,7 @@ function App() {
 
     peer.on("stream", (stream) => {
       partnerVideo.current.srcObject = stream;
+      // userVideo.current.srcObject = webcamStream;
     });
 
     peer.signal(callerSignal);
