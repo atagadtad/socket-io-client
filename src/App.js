@@ -155,11 +155,11 @@ function App() {
   };
 
   const UserVideo = () => {
-    return <video playsInline muted ref={userVideo} autoPlay />;
+    return <video playsInline ref={userVideo} autoPlay />;
   };
 
   const PartnerVideo = () => {
-    return <video playsInline muted ref={partnerVideo} autoPlay />;
+    return <video playsInline ref={partnerVideo} autoPlay />;
   };
 
   let IncomingCall = () => {
