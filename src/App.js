@@ -155,7 +155,7 @@ function App() {
   };
 
   const UserVideo = () => {
-    return <video playsInline ref={userVideo} autoPlay />;
+    return <video playsInline muted ref={userVideo} autoPlay />;
   };
 
   const PartnerVideo = () => {
