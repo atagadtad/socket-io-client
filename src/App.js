@@ -122,6 +122,7 @@ function App() {
     });
 
     socket.current.on("callAccepted", (signal) => {
+      setShowUsers(false);
       setCallAccepted(true);
       peer.signal(signal);
     });
