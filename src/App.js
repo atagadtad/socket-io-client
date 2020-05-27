@@ -132,6 +132,7 @@ function App() {
    */
   const acceptCall = () => {
     setCallAccepted(true);
+    setShowUsers(false);
 
     const peer = new Peer({
       initiator: false,
@@ -170,7 +171,14 @@ function App() {
   };
 
   const PartnerVideo = () => {
-    return <video playsInline ref={partnerVideo} autoPlay />;
+    return (
+      <video
+        className="partner-webcam"
+        playsInline
+        ref={partnerVideo}
+        autoPlay
+      />
+    );
   };
 
   let IncomingCall = () => {
