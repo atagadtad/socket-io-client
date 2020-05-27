@@ -203,7 +203,7 @@ function App() {
         className="btn btn-outline-dark"
         onClick={(e) => setShowUsers(!showUsers)}
       >
-        Online Users
+        {!showUsers ? "Online Users" : "Video Chat"}
       </button>
       {!showUsers && (
         <div className="videos">
