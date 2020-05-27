@@ -13,6 +13,10 @@
   background-color: black;
 }
 
+.users {
+  height: inherit;
+}
+
 .user-webcam {
   height: 100%;
   width: 100vw;
