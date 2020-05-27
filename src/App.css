@@ -13,9 +13,13 @@
   background-color: black;
 }
 
+.users-call-view {
+  display: grid;
+}
+
 .users {
   height: inherit;
-  position: fixed;
+  justify-self: start;
 }
 
 .user-webcam {

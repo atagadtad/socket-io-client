@@ -175,9 +175,17 @@ function App() {
 
   let IncomingCall = () => {
     return (
-      <div>
-        <h1>{caller} is calling you</h1>
-        <button onClick={acceptCall}>Accept</button>
+      <div className="receiving-call card">
+        <div className="card-body">
+          <h5 className="card-title">{caller} is calling you</h5>
+          <button
+            type="button"
+            className="btn btn-outline-success"
+            onClick={acceptCall}
+          >
+            Accept
+          </button>
+        </div>
       </div>
     );
   };
@@ -187,13 +195,18 @@ function App() {
       return null;
     }
     return (
-      <button key={key} onClick={() => callPeer(key)}>
+      <button
+        type="button"
+        className="btn btn-outline-success"
+        key={key}
+        onClick={() => callPeer(key)}
+      >
         Call {key}
       </button>
     );
   });
 
-  // useEffect(() => console.log(userVideo.current), [userVideo]);
+  useEffect(() => console.log({ yourID }), [yourID]);
 
   return (
     <div className="App">
@@ -205,21 +218,22 @@ function App() {
       >
         {!showUsers ? "Online Users" : "Video Chat"}
       </button>
-      {!showUsers && (
+      {!showUsers ? (
         <div className="videos">
           <div className="user-video">{webcamStream && <UserVideo />}</div>
           <div className="partner-video">
             {callAccepted && <PartnerVideo />}
           </div>
         </div>
-      )}
-      {showUsers && (
-        <div className="users">
-          <h3>Online Users:</h3>
-          {usersList}
+      ) : (
+        <div className="users-call-view">
+          <div className="users">
+            <h3>Online Users:</h3>
+            {usersList}
+          </div>
+          {receivingCall && <IncomingCall />}
         </div>
       )}
-      <div>{receivingCall && <IncomingCall />}</div>
     </div>
   );
 }
