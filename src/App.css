@@ -15,6 +15,7 @@
 
 .users {
   height: inherit;
+  position: fixed;
 }
 
 .user-webcam {

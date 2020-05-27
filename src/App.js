@@ -197,24 +197,22 @@ function App() {
 
   return (
     <div className="App">
-      <div className="videos">
-        <button
-          type="button"
-          id="online-users-btn"
-          className="btn btn-outline-dark"
-          onClick={(e) => setShowUsers(!showUsers)}
-        >
-          Online Users
-        </button>
-        {!showUsers && (
-          <>
-            <div className="user-video">{webcamStream && <UserVideo />}</div>
-            <div className="partner-video">
-              {callAccepted && <PartnerVideo />}
-            </div>
-          </>
-        )}
-      </div>
+      <button
+        type="button"
+        id="online-users-btn"
+        className="btn btn-outline-dark"
+        onClick={(e) => setShowUsers(!showUsers)}
+      >
+        Online Users
+      </button>
+      {!showUsers && (
+        <div className="videos">
+          <div className="user-video">{webcamStream && <UserVideo />}</div>
+          <div className="partner-video">
+            {callAccepted && <PartnerVideo />}
+          </div>
+        </div>
+      )}
       {showUsers && (
         <div className="users">
           <h3>Online Users:</h3>
