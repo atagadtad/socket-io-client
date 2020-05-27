@@ -196,13 +196,12 @@ function App() {
     <div className="App">
       <div className="videos">
         <div className="user-video">
-          {/* <h1>ME:</h1> */}
+          <button type="button" className="btn btn-secondary btn-lg">
+            Large button
+          </button>
           {webcamStream && <UserVideo />}
         </div>
-        <div className="partner-video">
-          {/* <h1>OTHER:</h1> */}
-          {callAccepted && <PartnerVideo />}
-        </div>
+        <div className="partner-video">{callAccepted && <PartnerVideo />}</div>
       </div>
       <div className="users">{usersList}</div>
       <div>{receivingCall && <IncomingCall />}</div>
