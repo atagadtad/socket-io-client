@@ -18,6 +18,14 @@
   width: 100vw;
 }
 
+#online-users-btn {
+  position: fixed;
+  top: 17px;
+  right: 17px;
+  color: white;
+  z-index: 1;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

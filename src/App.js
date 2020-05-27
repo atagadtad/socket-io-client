@@ -10,6 +10,7 @@ function App() {
   const [webcamStream, setStream] = useState();
   const [partnerStream, setPartnerStream] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
 
   const initialStates = {
     receivingCall: false,
@@ -90,7 +91,7 @@ function App() {
       partnerVideo.current.srcObject = partnerStream;
     }
     // eslint-disable-next-line
-  }, [users, receivingCall, caller, callerSignal, callAccepted]);
+  }, [users, receivingCall, caller, callerSignal, callAccepted, showUsers]);
 
   useEffect(() => {});
 
@@ -192,14 +193,21 @@ function App() {
     );
   });
 
+  useEffect(() => console.log(userVideo.current), [userVideo]);
+
   return (
     <div className="App">
       <div className="videos">
         <div className="user-video">
-          <button type="button" className="btn btn-secondary btn-lg">
-            Large button
+          <button
+            type="button"
+            id="online-users-btn"
+            className="btn btn-outline-dark"
+            onClick={(e) => setShowUsers(!showUsers)}
+          >
+            Online Users
           </button>
-          {webcamStream && <UserVideo />}
+          {!showUsers && <>{webcamStream && <UserVideo />}</>}
         </div>
         <div className="partner-video">{callAccepted && <PartnerVideo />}</div>
       </div>
