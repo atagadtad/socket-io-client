@@ -92,6 +92,8 @@ function App() {
     // eslint-disable-next-line
   }, [users, receivingCall, caller, callerSignal, callAccepted]);
 
+  useEffect(() => {});
+
   /**
    * call a user
    */
@@ -155,7 +157,15 @@ function App() {
   };
 
   const UserVideo = () => {
-    return <video playsInline muted ref={userVideo} autoPlay />;
+    return (
+      <video
+        className="user-webcam"
+        playsInline
+        muted
+        ref={userVideo}
+        autoPlay
+      />
+    );
   };
 
   const PartnerVideo = () => {
@@ -182,31 +192,15 @@ function App() {
     );
   });
 
-  // console.log({ currentStates });
-
-  // useEffect(() => {
-  //   if (userVideo.current !== undefined) {
-  //     console.log(userVideo.current.srcObject);
-  //   }
-  // }, [userVideo.current]);
-
-  // useEffect(() => {
-  //   if (partnerVideo.current !== undefined) {
-  //     console.log(partnerVideo.current.srcObject);
-  //   }
-  // }, [partnerVideo.current]);
-
-  // console.log({ userVideo, partnerVideo });
-
   return (
     <div className="App">
       <div className="videos">
-        <div>
-          <h1>ME:</h1>
+        <div className="user-video">
+          {/* <h1>ME:</h1> */}
           {webcamStream && <UserVideo />}
         </div>
-        <div>
-          <h1>OTHER:</h1>
+        <div className="partner-video">
+          {/* <h1>OTHER:</h1> */}
           {callAccepted && <PartnerVideo />}
         </div>
       </div>

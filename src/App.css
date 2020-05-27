@@ -1,5 +1,21 @@
 .App {
   text-align: center;
+  position: fixed;
+  height: 100vh;
+}
+
+.videos {
+  height: inherit;
+}
+
+.user-video {
+  height: inherit;
+  background-color: black;
+}
+
+.user-webcam {
+  height: 100%;
+  width: 100vw;
 }
 
 .App-logo {
