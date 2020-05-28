@@ -221,8 +221,9 @@ function App() {
 
   const handleMovePartnerVideo = (e) => {
     const touchLocation = e.targetTouches[0];
-    partnerBox.current.style.left = `${touchLocation.pageX}px`;
-    partnerBox.current.style.top = `${touchLocation.pageY}px`;
+    // - 50 to auto center users finger on box location
+    partnerBox.current.style.left = `${touchLocation.pageX - 50}px`;
+    partnerBox.current.style.top = `${touchLocation.pageY - 100}px`;
     // console.log(partnerBox.current.style);
   };
 
@@ -248,6 +249,13 @@ function App() {
           >
             {callAccepted && <PartnerVideo />}
           </div>
+          {/* <div
+            className="partner-box"
+            ref={partnerBox}
+            onTouchMove={(e) => {
+              handleMovePartnerVideo(e);
+            }}
+          ></div> */}
         </div>
       ) : (
         <div className="users-call-view">
