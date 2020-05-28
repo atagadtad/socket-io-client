@@ -217,6 +217,15 @@ function App() {
 
   useEffect(() => console.log({ yourID }), [yourID]);
 
+  const partnerBox = useRef(null);
+
+  const handleMovePartnerVideo = (e) => {
+    const touchLocation = e.targetTouches[0];
+    partnerBox.current.style.left = `${touchLocation.pageX}px`;
+    partnerBox.current.style.top = `${touchLocation.pageY}px`;
+    // console.log(partnerBox.current.style);
+  };
+
   return (
     <div className="App">
       <button
@@ -230,7 +239,13 @@ function App() {
       {!showUsers ? (
         <div className="videos">
           <div className="user-video">{webcamStream && <UserVideo />}</div>
-          <div className="partner-video">
+          <div
+            className="partner-video"
+            ref={partnerBox}
+            onTouchMove={(e) => {
+              handleMovePartnerVideo(e);
+            }}
+          >
             {callAccepted && <PartnerVideo />}
           </div>
         </div>
