@@ -162,8 +162,7 @@ function App() {
     });
     return (
       <video
-        // className="user-webcam"
-        className="partner-webcam"
+        className="user-webcam"
         playsInline
         muted
         ref={userVideo}
@@ -181,8 +180,7 @@ function App() {
 
     return (
       <video
-        // className="partner-webcam"
-        className="user-webcam"
+        className="partner-webcam"
         playsInline
         ref={partnerVideo}
         autoPlay
