@@ -17,15 +17,17 @@
   position: absolute;
   top: 10px;
   left: 10px;
+  overscroll-behavior: contain;
 }
 
-/* .partner-box {
+.partner-box {
   position: absolute;
   bottom: 10px;
   height: 20vh;
   width: 100px;
   background-color: white;
-} */
+  overscroll-behavior: contain;
+}
 
 .partner-webcam {
   height: 20vh;

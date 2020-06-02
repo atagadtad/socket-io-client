@@ -27,6 +27,11 @@ function App() {
           caller: action.data.from,
           callerSignal: action.data.signal,
         };
+      case "BOTH_PARTIES_ACCEPTED_CALL":
+        return {
+          ...state,
+          receivingCall: false,
+        };
       default:
         throw new Error(
           `Tried to reduce with unsupported action type: ${action.type}`
@@ -45,6 +50,10 @@ function App() {
 
   const handleReceivingCall = (data) => {
     dispatchCurrentStates({ type: "SOMEONE_IS_CALLING_YOU", data });
+  };
+
+  const handleCloseReceivingCallAlert = () => {
+    dispatchCurrentStates({ type: "BOTH_PARTIES_ACCEPTED_CALL" });
   };
 
   const userVideo = useRef();
@@ -71,10 +80,12 @@ function App() {
       setYourID(id);
     });
     socket.current.on("allUsers", (users) => {
+      // console.log("initial useEffect: ", userVideo);
       setUsers(users);
     });
 
     socket.current.on("hey", (data) => {
+      console.log("hey");
       handleReceivingCall(data);
     });
   }, []);
@@ -83,15 +94,15 @@ function App() {
    * when setUsers was called, the state of webcamStream was referred from its initial state
    * so I have this useEffect below to set the ref to the current webcamStream state
    */
-  useEffect(() => {
-    if (userVideo.current) {
-      userVideo.current.srcObject = webcamStream;
-    }
-    if (partnerVideo.current) {
-      partnerVideo.current.srcObject = partnerStream;
-    }
-    // eslint-disable-next-line
-  }, [users, receivingCall, caller, callerSignal, callAccepted, showUsers]);
+  // useEffect(() => {
+  //   if (userVideo.current) {
+  //     userVideo.current.srcObject = webcamStream;
+  //   }
+  //   if (partnerVideo.current) {
+  //     partnerVideo.current.srcObject = partnerStream;
+  //   }
+  //   // eslint-disable-next-line
+  // }, [users, receivingCall, caller, callerSignal, callAccepted, showUsers]);
 
   useEffect(() => {});
 
@@ -106,6 +117,7 @@ function App() {
     });
 
     peer.on("signal", (data) => {
+      console.log("emit callUser");
       socket.current.emit("callUser", {
         userToCall: id,
         signalData: data,
@@ -115,15 +127,14 @@ function App() {
 
     peer.on("stream", (stream) => {
       if (partnerVideo.current) {
-        console.log("callingPeer partnerVideo");
         partnerVideo.current.srcObject = stream;
-        // userVideo.current.srcObject = webcamStream;
       }
     });
 
     socket.current.on("callAccepted", (signal) => {
       setShowUsers(false);
       setCallAccepted(true);
+      // handleCloseReceivingCallAlert();
       peer.signal(signal);
     });
   };
@@ -134,6 +145,8 @@ function App() {
   const acceptCall = () => {
     setCallAccepted(true);
     setShowUsers(false);
+
+    handleCloseReceivingCallAlert();
 
     const peer = new Peer({
       initiator: false,
@@ -150,16 +163,16 @@ function App() {
 
     peer.on("stream", (stream) => {
       setPartnerStream(stream);
-      // console.log({ stream });
-      // partnerVideo.current.srcObject = stream;
-      // console.log(partnerVideo.current);
-      // userVideo.current.srcObject = webcamStream;
     });
 
     peer.signal(callerSignal);
   };
 
   const UserVideo = () => {
+    useEffect(() => {
+      userVideo.current.srcObject = webcamStream;
+    });
+
     return (
       <video
         className="user-webcam"
@@ -215,7 +228,11 @@ function App() {
     );
   });
 
-  useEffect(() => console.log({ yourID }), [yourID]);
+  // useEffect(() => console.log({ yourID }), [yourID]);
+
+  // useEffect(() => console.log({ currentStates }), [currentStates]);
+
+  // useEffect(() => console.log({ webcamStream }), [webcamStream]);
 
   const partnerBox = useRef(null);
 
@@ -224,7 +241,6 @@ function App() {
     // - 50 to auto center users finger on box location
     partnerBox.current.style.left = `${touchLocation.pageX - 50}px`;
     partnerBox.current.style.top = `${touchLocation.pageY - 100}px`;
-    // console.log(partnerBox.current.style);
   };
 
   return (
@@ -239,7 +255,9 @@ function App() {
       </button>
       {!showUsers ? (
         <div className="videos">
-          <div className="user-video">{webcamStream && <UserVideo />}</div>
+          {/* <div className="user-video">{webcamStream && <UserVideo />}</div> */}
+          <div className="user-video">{userVideo && <UserVideo />}</div>
+
           <div
             className="partner-video"
             ref={partnerBox}
@@ -252,6 +270,7 @@ function App() {
           {/* <div
             className="partner-box"
             ref={partnerBox}
+            // onTouchMove is for mobile
             onTouchMove={(e) => {
               handleMovePartnerVideo(e);
             }}
