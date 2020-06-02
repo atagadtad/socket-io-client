@@ -157,12 +157,13 @@ function App() {
     useEffect(() => {
       if (userVideo.current) {
         userVideo.current.srcObject = webcamStream;
+        console.log(userVideo);
       }
     });
-
     return (
       <video
-        className="user-webcam"
+        // className="user-webcam"
+        className="partner-webcam"
         playsInline
         muted
         ref={userVideo}
@@ -180,7 +181,8 @@ function App() {
 
     return (
       <video
-        className="partner-webcam"
+        // className="partner-webcam"
+        className="user-webcam"
         playsInline
         ref={partnerVideo}
         autoPlay
