@@ -80,17 +80,13 @@ function App() {
       setYourID(id);
     });
     socket.current.on("allUsers", (users) => {
-      // console.log("initial useEffect: ", userVideo);
       setUsers(users);
     });
 
     socket.current.on("hey", (data) => {
-      console.log("hey");
       handleReceivingCall(data);
     });
   }, []);
-
-  useEffect(() => {});
 
   /**
    * call a user
@@ -101,6 +97,8 @@ function App() {
       trickle: false,
       stream: webcamStream,
     });
+
+    console.log("callPeer");
 
     peer.on("signal", (data) => {
       console.log("emit callUser");
@@ -118,9 +116,10 @@ function App() {
     });
 
     socket.current.on("callAccepted", (signal) => {
+      console.log("callAccepted");
       setShowUsers(false);
       setCallAccepted(true);
-      // handleCloseReceivingCallAlert();
+
       peer.signal(signal);
     });
   };
@@ -156,7 +155,9 @@ function App() {
 
   const UserVideo = () => {
     useEffect(() => {
-      userVideo.current.srcObject = webcamStream;
+      if (userVideo.current) {
+        userVideo.current.srcObject = webcamStream;
+      }
     });
 
     return (
@@ -172,7 +173,9 @@ function App() {
 
   const PartnerVideo = () => {
     useEffect(() => {
-      partnerVideo.current.srcObject = partnerStream;
+      if (partnerVideo.current) {
+        partnerVideo.current.srcObject = partnerStream;
+      }
     });
 
     return (
@@ -218,12 +221,6 @@ function App() {
     );
   });
 
-  // useEffect(() => console.log({ yourID }), [yourID]);
-
-  // useEffect(() => console.log({ currentStates }), [currentStates]);
-
-  // useEffect(() => console.log({ webcamStream }), [webcamStream]);
-
   const partnerBox = useRef(null);
 
   const handleMovePartnerVideo = (e) => {
@@ -245,8 +242,7 @@ function App() {
       </button>
       {!showUsers ? (
         <div className="videos">
-          {/* <div className="user-video">{webcamStream && <UserVideo />}</div> */}
-          <div className="user-video">{userVideo && <UserVideo />}</div>
+          <div className="user-video">{webcamStream && <UserVideo />}</div>
 
           <div
             className="partner-video"
