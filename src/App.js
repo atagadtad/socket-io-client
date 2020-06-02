@@ -90,20 +90,6 @@ function App() {
     });
   }, []);
 
-  /**
-   * when setUsers was called, the state of webcamStream was referred from its initial state
-   * so I have this useEffect below to set the ref to the current webcamStream state
-   */
-  // useEffect(() => {
-  //   if (userVideo.current) {
-  //     userVideo.current.srcObject = webcamStream;
-  //   }
-  //   if (partnerVideo.current) {
-  //     partnerVideo.current.srcObject = partnerStream;
-  //   }
-  //   // eslint-disable-next-line
-  // }, [users, receivingCall, caller, callerSignal, callAccepted, showUsers]);
-
   useEffect(() => {});
 
   /**
@@ -185,6 +171,10 @@ function App() {
   };
 
   const PartnerVideo = () => {
+    useEffect(() => {
+      partnerVideo.current.srcObject = partnerStream;
+    });
+
     return (
       <video
         className="partner-webcam"
