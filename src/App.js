@@ -162,7 +162,7 @@ function App() {
     });
     return (
       <video
-        className="user-webcam"
+        className={callAccepted ? `partner-webcam` : `user-webcam`}
         playsInline
         muted
         ref={userVideo}
@@ -180,7 +180,7 @@ function App() {
 
     return (
       <video
-        className="partner-webcam"
+        className={callAccepted ? `user-webcam` : `partner-webcam`}
         playsInline
         ref={partnerVideo}
         autoPlay
@@ -242,10 +242,12 @@ function App() {
       </button>
       {!showUsers ? (
         <div className="videos">
-          <div className="user-video">{webcamStream && <UserVideo />}</div>
+          <div className={callAccepted ? `partner-video` : `user-video`}>
+            {webcamStream && <UserVideo />}
+          </div>
 
           <div
-            className="partner-video"
+            className={callAccepted ? `user-video` : `partner-video`}
             ref={partnerBox}
             onTouchMove={(e) => {
               handleMovePartnerVideo(e);
