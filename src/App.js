@@ -16,6 +16,7 @@ function App() {
     receivingCall: false,
     caller: "",
     callerSignal: null,
+    endCall: false,
   };
 
   const stateReducer = (state, action) => {
@@ -32,6 +33,14 @@ function App() {
           ...state,
           receivingCall: false,
         };
+      case "END_CALL":
+        return {
+          ...state,
+          receivingCall: false,
+          caller: "",
+          callerSignal: null,
+          endCall: true,
+        };
       default:
         throw new Error(
           `Tried to reduce with unsupported action type: ${action.type}`
@@ -47,6 +56,7 @@ function App() {
   const receivingCall = currentStates.receivingCall;
   const caller = currentStates.caller;
   const callerSignal = currentStates.callerSignal;
+  // const endCall = currentStates.endCall;
 
   const handleReceivingCall = (data) => {
     dispatchCurrentStates({ type: "SOMEONE_IS_CALLING_YOU", data });
@@ -56,13 +66,17 @@ function App() {
     dispatchCurrentStates({ type: "BOTH_PARTIES_ACCEPTED_CALL" });
   };
 
+  // const handleEndCall = () => {
+  //   dispatchCurrentStates({ type: "ENDCALL" });
+  // };
+
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
 
   useEffect(() => {
-    socket.current = io("https://socket-video-atags.herokuapp.com/");
-    // socket.current = io("http://localhost:8000");
+    // socket.current = io("https://socket-video-atags.herokuapp.com/");
+    socket.current = io("http://localhost:8000");
 
     navigator.mediaDevices
       .getUserMedia({
@@ -83,6 +97,10 @@ function App() {
       setUsers(users);
     });
 
+    // socket.current.on("endOrRejectCall", () => {
+    //   console.log("ending call");
+    // });
+
     socket.current.on("hey", (data) => {
       handleReceivingCall(data);
     });
@@ -98,10 +116,7 @@ function App() {
       stream: webcamStream,
     });
 
-    console.log("callPeer");
-
     peer.on("signal", (data) => {
-      console.log("emit callUser");
       socket.current.emit("callUser", {
         userToCall: id,
         signalData: data,
@@ -116,11 +131,14 @@ function App() {
     });
 
     socket.current.on("callAccepted", (signal) => {
-      console.log("callAccepted");
       setShowUsers(false);
       setCallAccepted(true);
-
       peer.signal(signal);
+    });
+
+    socket.current.on("endingCall", () => {
+      peer.removeAllListeners();
+      peer.destroy();
     });
   };
 
@@ -151,6 +169,18 @@ function App() {
     });
 
     peer.signal(callerSignal);
+
+    socket.current.on("endingCall", () => {
+      peer.removeAllListeners();
+      peer.destroy();
+    });
+  };
+
+  const closeAndEndCall = () => {
+    socket.current.emit("endTheCall", {
+      from: "HAI",
+    });
+    // handleEndCall();
   };
 
   const UserVideo = () => {
@@ -200,6 +230,13 @@ function App() {
           >
             Accept
           </button>
+          <button
+            type="button"
+            className="btn btn-outline-danger"
+            onClick={closeAndEndCall}
+          >
+            Decline
+          </button>
         </div>
       </div>
     );
@@ -242,13 +279,16 @@ function App() {
       </button>
       {!showUsers ? (
         <div className="videos">
-          <div className={callAccepted ? `partner-video` : `user-video`}>
+          <div
+            className={callAccepted ? `partner-video` : `user-video`}
+            ref={callAccepted ? partnerBox : null}
+          >
             {webcamStream && <UserVideo />}
           </div>
 
           <div
             className={callAccepted ? `user-video` : `partner-video`}
-            ref={partnerBox}
+            // ref={partnerBox}
             onTouchMove={(e) => {
               handleMovePartnerVideo(e);
             }}
