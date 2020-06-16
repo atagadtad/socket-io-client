@@ -136,7 +136,8 @@ function App() {
       peer.signal(signal);
     });
 
-    socket.current.on("endingCall", () => {
+    socket.current.on("endCall", () => {
+      console.log("endCall on callPeer func.");
       peer.removeAllListeners();
       peer.destroy();
     });
@@ -170,7 +171,8 @@ function App() {
 
     peer.signal(callerSignal);
 
-    socket.current.on("endingCall", () => {
+    socket.current.on("endCall", () => {
+      console.log("endCall on acceptCall func.");
       peer.removeAllListeners();
       peer.destroy();
     });
@@ -178,7 +180,8 @@ function App() {
 
   const closeAndEndCall = () => {
     socket.current.emit("endTheCall", {
-      from: "HAI",
+      from: yourID,
+      to: caller,
     });
     // handleEndCall();
   };
@@ -187,7 +190,7 @@ function App() {
     useEffect(() => {
       if (userVideo.current) {
         userVideo.current.srcObject = webcamStream;
-        console.log(userVideo);
+        // console.log(userVideo);
       }
     });
     return (
@@ -233,7 +236,7 @@ function App() {
           <button
             type="button"
             className="btn btn-outline-danger"
-            onClick={closeAndEndCall}
+            // onClick={closeAndEndCall}
           >
             Decline
           </button>
@@ -294,6 +297,15 @@ function App() {
             }}
           >
             {callAccepted && <PartnerVideo />}
+            {callAccepted && (
+              <button
+                type="button"
+                className="btn btn-outline-danger end-call"
+                onClick={closeAndEndCall}
+              >
+                END CALL
+              </button>
+            )}
           </div>
           {/* <div
             className="partner-box"
