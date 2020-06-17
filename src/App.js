@@ -10,6 +10,8 @@ function App() {
   const [webcamStream, setStream] = useState();
   const [partnerStream, setPartnerStream] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
+  const [callDeclined, setCallDeclined] = useState(false);
+  const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
 
   const initialStates = {
@@ -128,16 +130,6 @@ function App() {
       stream: webcamStream,
     });
 
-    // if (peer.destroyed) {
-    //   peer = new Peer({
-    //     initiator: true,
-    //     trickle: false,
-    //     stream: webcamStream,
-    //   });
-    // }
-
-    // console.log("callPeer: ", { peer });
-
     peer.on("signal", (data) => {
       socket.current.emit("callUser", {
         userToCall: id,
@@ -170,6 +162,8 @@ function App() {
       if (data.callDeclined) {
         // change state so notification alerts user that call declined
         console.log("CALL DECLINED!");
+        setCallDeclined(true);
+        // setAwaitingResponse(false);
       }
     });
 
@@ -237,6 +231,7 @@ function App() {
 
   const declineCall = () => {
     handleCloseReceivingCallAlert();
+
     socket.current.emit("declineCall", {
       from: caller,
     });
@@ -302,6 +297,30 @@ function App() {
     );
   };
 
+  const CallLoadingScreen = () => {
+    return (
+      <div className="card">
+        <div className="card-body">
+          <h5 className="card-title">
+            {callDeclined ? `Call Declined` : `Awaiting Response`}
+          </h5>
+          {callDeclined && (
+            <button
+              type="button"
+              className="btn btn-outline-danger"
+              onClick={() => {
+                setAwaitingResponse(false);
+                setCallDeclined(false);
+              }}
+            >
+              Close
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const usersList = Object.keys(users).map((key) => {
     if (key === yourID) {
       return null;
@@ -311,7 +330,10 @@ function App() {
         type="button"
         className="btn btn-outline-success"
         key={key}
-        onClick={() => callPeer(key)}
+        onClick={() => {
+          callPeer(key);
+          setAwaitingResponse(true);
+        }}
       >
         Call {key}
       </button>
@@ -380,6 +402,7 @@ function App() {
             {usersList}
           </div>
           {receivingCall && <IncomingCall />}
+          {awaitingResponse && <CallLoadingScreen />}
         </div>
       )}
     </div>
