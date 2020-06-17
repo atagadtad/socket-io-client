@@ -28,6 +28,11 @@ function App() {
           caller: action.data.from,
           callerSignal: action.data.signal,
         };
+      case "USER_YOU_ARE_CALLING":
+        return {
+          ...state,
+          caller: action.id,
+        };
       case "BOTH_PARTIES_ACCEPTED_CALL":
         return {
           ...state,
@@ -62,13 +67,18 @@ function App() {
     dispatchCurrentStates({ type: "SOMEONE_IS_CALLING_YOU", data });
   };
 
+  const setUserYouAreCalling = (id) => {
+    // console.log({ id }, "setUserYouArecalling");
+    dispatchCurrentStates({ type: "USER_YOU_ARE_CALLING", id });
+  };
+
   const handleCloseReceivingCallAlert = () => {
     dispatchCurrentStates({ type: "BOTH_PARTIES_ACCEPTED_CALL" });
   };
 
-  // const handleEndCall = () => {
-  //   dispatchCurrentStates({ type: "ENDCALL" });
-  // };
+  const handleEndCall = () => {
+    dispatchCurrentStates({ type: "END_CALL" });
+  };
 
   const userVideo = useRef();
   const partnerVideo = useRef();
@@ -110,11 +120,23 @@ function App() {
    * call a user
    */
   const callPeer = (id) => {
-    const peer = new Peer({
+    setUserYouAreCalling(id);
+    let peer;
+    peer = new Peer({
       initiator: true,
       trickle: false,
       stream: webcamStream,
     });
+
+    // if (peer.destroyed) {
+    //   peer = new Peer({
+    //     initiator: true,
+    //     trickle: false,
+    //     stream: webcamStream,
+    //   });
+    // }
+
+    // console.log("callPeer: ", { peer });
 
     peer.on("signal", (data) => {
       socket.current.emit("callUser", {
@@ -133,15 +155,27 @@ function App() {
     socket.current.on("callAccepted", (signal) => {
       setShowUsers(false);
       setCallAccepted(true);
+      if (peer.destroyed) {
+        peer = new Peer({
+          initiator: true,
+          trickle: false,
+          stream: webcamStream,
+        });
+      }
       peer.signal(signal);
     });
 
     socket.current.on("endCall", () => {
-      console.log("endCall on callPeer func.");
+      // console.log("endCall on callPeer func.");
       peer.removeAllListeners();
       peer.destroy();
+      // window.location.reload();
+      setCallAccepted(false);
+      handleEndCall();
     });
   };
+
+  // console.log({ currentStates });
 
   /**
    * accept incoming call
@@ -158,6 +192,8 @@ function App() {
       stream: webcamStream,
     });
 
+    // console.log("acceptCall: ", { peer });
+
     peer.on("signal", (data) => {
       socket.current.emit("acceptCall", {
         signal: data,
@@ -172,13 +208,18 @@ function App() {
     peer.signal(callerSignal);
 
     socket.current.on("endCall", () => {
-      console.log("endCall on acceptCall func.");
+      // console.log("endCall on acceptCall func.");
       peer.removeAllListeners();
       peer.destroy();
+      // console.log("reload?");
+      // window.location.reload();
+      setCallAccepted(false);
+      handleEndCall();
     });
   };
 
   const closeAndEndCall = () => {
+    console.log({ yourID }, { caller });
     socket.current.emit("endTheCall", {
       from: yourID,
       to: caller,
