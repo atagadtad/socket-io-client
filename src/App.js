@@ -85,8 +85,8 @@ function App() {
   const socket = useRef();
 
   useEffect(() => {
-    socket.current = io("https://socket-video-atags.herokuapp.com/");
-    // socket.current = io("http://localhost:8000");
+    // socket.current = io("https://socket-video-atags.herokuapp.com/");
+    socket.current = io("http://localhost:8000");
 
     navigator.mediaDevices
       .getUserMedia({
@@ -165,6 +165,14 @@ function App() {
       peer.signal(signal);
     });
 
+    socket.current.on("callDeclined", (data) => {
+      // console.log({ data });
+      if (data.callDeclined) {
+        // change state so notification alerts user that call declined
+        console.log("CALL DECLINED!");
+      }
+    });
+
     socket.current.on("endCall", () => {
       // console.log("endCall on callPeer func.");
       peer.removeAllListeners();
@@ -229,6 +237,9 @@ function App() {
 
   const declineCall = () => {
     handleCloseReceivingCallAlert();
+    socket.current.emit("declineCall", {
+      from: caller,
+    });
     // let other user know you declined the call
   };
 
@@ -267,7 +278,7 @@ function App() {
     );
   };
 
-  let IncomingCall = () => {
+  const IncomingCall = () => {
     return (
       <div className="receiving-call card">
         <div className="card-body">
