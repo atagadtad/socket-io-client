@@ -147,6 +147,7 @@ function App() {
     socket.current.on("callAccepted", (signal) => {
       setShowUsers(false);
       setCallAccepted(true);
+      setAwaitingResponse(false);
       if (peer.destroyed) {
         peer = new Peer({
           initiator: true,
