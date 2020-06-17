@@ -219,12 +219,16 @@ function App() {
   };
 
   const closeAndEndCall = () => {
-    console.log({ yourID }, { caller });
+    // console.log({ yourID }, { caller });
     socket.current.emit("endTheCall", {
       from: yourID,
       to: caller,
     });
     // handleEndCall();
+  };
+
+  const declineCall = () => {
+    setCallAccepted(false);
   };
 
   const UserVideo = () => {
@@ -277,7 +281,7 @@ function App() {
           <button
             type="button"
             className="btn btn-outline-danger"
-            // onClick={closeAndEndCall}
+            onClick={declineCall}
           >
             Decline
           </button>
