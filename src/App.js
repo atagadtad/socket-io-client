@@ -87,8 +87,8 @@ function App() {
   const socket = useRef();
 
   useEffect(() => {
-    // socket.current = io("https://socket-video-atags.herokuapp.com/");
-    socket.current = io("http://localhost:8000");
+    socket.current = io("https://socket-video-atags.herokuapp.com/");
+    // socket.current = io("http://localhost:8000");
 
     navigator.mediaDevices
       .getUserMedia({
