@@ -228,7 +228,8 @@ function App() {
   };
 
   const declineCall = () => {
-    setCallAccepted(false);
+    handleCloseReceivingCallAlert();
+    // let other user know you declined the call
   };
 
   const UserVideo = () => {
