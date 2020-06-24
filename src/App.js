@@ -87,8 +87,8 @@ function App() {
   const socket = useRef();
 
   useEffect(() => {
-    socket.current = io("https://socket-video-atags.herokuapp.com/");
-    // socket.current = io("http://localhost:8000");
+    // socket.current = io("https://socket-video-atags.herokuapp.com/");
+    socket.current = io("http://localhost:8000");
 
     navigator.mediaDevices
       .getUserMedia({
@@ -117,6 +117,8 @@ function App() {
       handleReceivingCall(data);
     });
   }, []);
+
+  useEffect(() => console.log({ users }), [users]);
 
   /**
    * call a user
@@ -322,21 +324,41 @@ function App() {
     );
   };
 
-  const usersList = Object.keys(users).map((key) => {
-    if (key === yourID) {
+  // const usersList = Object.keys(users).map((key) => {
+  //   if (key === yourID) {
+  //     return null;
+  //   }
+  //   return (
+  //     <button
+  //       type="button"
+  //       className="btn btn-outline-success"
+  //       key={key}
+  //       onClick={() => {
+  //         callPeer(key);
+  //         setAwaitingResponse(true);
+  //       }}
+  //     >
+  //       Call {key}
+  //     </button>
+  //   );
+  // });
+
+  const usersList = Object.entries(users).map((user, i) => {
+    if (user[0] === yourID) {
       return null;
     }
+    console.log({ user });
     return (
       <button
         type="button"
         className="btn btn-outline-success"
-        key={key}
+        key={user[0]}
         onClick={() => {
-          callPeer(key);
+          callPeer(user[0]);
           setAwaitingResponse(true);
         }}
       >
-        Call {key}
+        Call {user[0]}
       </button>
     );
   });
