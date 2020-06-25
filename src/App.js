@@ -43,6 +43,7 @@ function App() {
     caller: "",
     callerSignal: null,
     endCall: false,
+    callerUsername: "",
   };
 
   const stateReducer = (state, action) => {
@@ -53,6 +54,7 @@ function App() {
           receivingCall: true,
           caller: action.data.from,
           callerSignal: action.data.signal,
+          callerUsername: action.data.fromUsername,
         };
       case "USER_YOU_ARE_CALLING":
         return {
@@ -71,6 +73,7 @@ function App() {
           caller: "",
           callerSignal: null,
           endCall: true,
+          callerUsername: "",
         };
       default:
         throw new Error(
@@ -87,6 +90,7 @@ function App() {
   const receivingCall = currentStates.receivingCall;
   const caller = currentStates.caller;
   const callerSignal = currentStates.callerSignal;
+  const callerUsername = currentStates.callerUsername;
   // const endCall = currentStates.endCall;
 
   const handleReceivingCall = (data) => {
@@ -111,8 +115,8 @@ function App() {
   const socket = useRef();
 
   useEffect(() => {
-    socket.current = io("https://socket-video-atags.herokuapp.com/");
-    // socket.current = io("http://localhost:8000");
+    // socket.current = io("https://socket-video-atags.herokuapp.com/");
+    socket.current = io("http://localhost:8000");
 
     navigator.mediaDevices
       .getUserMedia({
@@ -167,6 +171,8 @@ function App() {
         userToCall: id,
         signalData: data,
         from: yourID,
+        fromUsername: username,
+        // from: username,
       });
     });
 
@@ -310,7 +316,7 @@ function App() {
     return (
       <div className="receiving-call card">
         <div className="card-body">
-          <h5 className="card-title">{caller} is calling you</h5>
+          <h5 className="card-title">{callerUsername} is calling you</h5>
           <button
             type="button"
             className="btn btn-outline-success"
