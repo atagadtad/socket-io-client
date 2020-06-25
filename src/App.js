@@ -361,7 +361,11 @@ function App() {
   };
 
   const usersList = Object.entries(users).map((user) => {
+    // console.log({ user });
     if (user[0] === yourID) {
+      return null;
+    }
+    if (user[1].userName === "") {
       return null;
     }
     return (
