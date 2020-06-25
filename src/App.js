@@ -2,7 +2,29 @@ import React, { useEffect, useState, useReducer, useRef } from "react";
 import "./App.css";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-// import StateContext from "./stateContext";
+
+// ChangeUserName outisde of App because it's a form component
+const ChangeUserName = (props) => {
+  return (
+    <form onSubmit={props.handleSubmitUsername}>
+      <div className="form-group">
+        <label htmlFor="exampleInputEmail1">Username</label>
+        <input
+          type="text"
+          className="form-control"
+          id="exampleInputEmail1"
+          placeholder="Enter your new username"
+          onChange={(e) => props.setUsernameInput(e.target.value)}
+          value={props.usernameInput}
+        />
+      </div>
+
+      <button type="submit" className="btn btn-primary">
+        Submit
+      </button>
+    </form>
+  );
+};
 
 function App() {
   const [yourID, setYourID] = useState("");
@@ -13,6 +35,7 @@ function App() {
   const [callDeclined, setCallDeclined] = useState(false);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
+  const [usernameInput, setUsernameInput] = useState("");
 
   const initialStates = {
     receivingCall: false,
@@ -343,7 +366,7 @@ function App() {
   //   );
   // });
 
-  const usersList = Object.entries(users).map((user, i) => {
+  const usersList = Object.entries(users).map((user) => {
     if (user[0] === yourID) {
       return null;
     }
@@ -358,10 +381,12 @@ function App() {
           setAwaitingResponse(true);
         }}
       >
-        Call {user[0]}
+        Call {user[1].userName}
       </button>
     );
   });
+
+  // useEffect(() => console.log(usernameInput), [usernameInput]);
 
   const partnerBox = useRef(null);
 
@@ -370,6 +395,13 @@ function App() {
     // - 50 to auto center users finger on box location
     partnerBox.current.style.left = `${touchLocation.pageX - 50}px`;
     partnerBox.current.style.top = `${touchLocation.pageY - 100}px`;
+  };
+
+  const handleSubmitUsername = (e) => {
+    e.preventDefault();
+    socket.current.emit("changeUsername", {
+      updatedUsername: usernameInput,
+    });
   };
 
   return (
@@ -426,6 +458,11 @@ function App() {
           </div>
           {receivingCall && <IncomingCall />}
           {awaitingResponse && <CallLoadingScreen />}
+          <ChangeUserName
+            usernameInput={usernameInput}
+            setUsernameInput={setUsernameInput}
+            handleSubmitUsername={handleSubmitUsername}
+          />
         </div>
       )}
     </div>
