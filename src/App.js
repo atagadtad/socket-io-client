@@ -36,6 +36,7 @@ function App() {
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
   const [usernameInput, setUsernameInput] = useState("");
+  const [username, setUsername] = useState("");
 
   const initialStates = {
     receivingCall: false,
@@ -110,8 +111,8 @@ function App() {
   const socket = useRef();
 
   useEffect(() => {
-    // socket.current = io("https://socket-video-atags.herokuapp.com/");
-    socket.current = io("http://localhost:8000");
+    socket.current = io("https://socket-video-atags.herokuapp.com/");
+    // socket.current = io("http://localhost:8000");
 
     navigator.mediaDevices
       .getUserMedia({
@@ -132,16 +133,22 @@ function App() {
       setUsers(users);
     });
 
-    // socket.current.on("endOrRejectCall", () => {
-    //   console.log("ending call");
-    // });
+    socket.current.on("updatedUsername", (data) => {
+      // console.log({ data });
+      setUsername(data.updatedUsername);
+    });
 
     socket.current.on("hey", (data) => {
       handleReceivingCall(data);
     });
   }, []);
 
-  useEffect(() => console.log({ users }), [users]);
+  useEffect(() => {
+    // console.log({ users });
+    // if (users !== {} && users[yourID] !== undefined) {
+    //   console.log(users[yourID].userName === "");
+    // }
+  }, [users]);
 
   /**
    * call a user
@@ -347,30 +354,10 @@ function App() {
     );
   };
 
-  // const usersList = Object.keys(users).map((key) => {
-  //   if (key === yourID) {
-  //     return null;
-  //   }
-  //   return (
-  //     <button
-  //       type="button"
-  //       className="btn btn-outline-success"
-  //       key={key}
-  //       onClick={() => {
-  //         callPeer(key);
-  //         setAwaitingResponse(true);
-  //       }}
-  //     >
-  //       Call {key}
-  //     </button>
-  //   );
-  // });
-
   const usersList = Object.entries(users).map((user) => {
     if (user[0] === yourID) {
       return null;
     }
-    console.log({ user });
     return (
       <button
         type="button"
@@ -406,64 +393,68 @@ function App() {
 
   return (
     <div className="App">
-      <button
-        type="button"
-        id="online-users-btn"
-        className="btn btn-outline-dark"
-        onClick={(e) => setShowUsers(!showUsers)}
-      >
-        {!showUsers ? "Online Users" : "Video Chat"}
-      </button>
-      {!showUsers ? (
-        <div className="videos">
-          <div
-            className={callAccepted ? `partner-video` : `user-video`}
-            ref={callAccepted ? partnerBox : null}
-          >
-            {webcamStream && <UserVideo />}
-          </div>
-
-          <div
-            className={callAccepted ? `user-video` : `partner-video`}
-            // ref={partnerBox}
-            onTouchMove={(e) => {
-              handleMovePartnerVideo(e);
-            }}
-          >
-            {callAccepted && <PartnerVideo />}
-            {callAccepted && (
-              <button
-                type="button"
-                className="btn btn-outline-danger end-call"
-                onClick={closeAndEndCall}
-              >
-                END CALL
-              </button>
-            )}
-          </div>
-          {/* <div
-            className="partner-box"
-            ref={partnerBox}
-            // onTouchMove is for mobile
-            onTouchMove={(e) => {
-              handleMovePartnerVideo(e);
-            }}
-          ></div> */}
-        </div>
+      {username === "" ? (
+        <ChangeUserName
+          usernameInput={usernameInput}
+          setUsernameInput={setUsernameInput}
+          handleSubmitUsername={handleSubmitUsername}
+        />
       ) : (
-        <div className="users-call-view">
-          <div className="users">
-            <h3>Online Users:</h3>
-            {usersList}
-          </div>
-          {receivingCall && <IncomingCall />}
-          {awaitingResponse && <CallLoadingScreen />}
-          <ChangeUserName
-            usernameInput={usernameInput}
-            setUsernameInput={setUsernameInput}
-            handleSubmitUsername={handleSubmitUsername}
-          />
-        </div>
+        <>
+          <button
+            type="button"
+            id="online-users-btn"
+            className="btn btn-outline-dark"
+            onClick={(e) => setShowUsers(!showUsers)}
+          >
+            {!showUsers ? "Online Users" : "Video Chat"}
+          </button>
+
+          {!showUsers ? (
+            <div className="videos">
+              <div
+                className={callAccepted ? `partner-video` : `user-video`}
+                ref={callAccepted ? partnerBox : null}
+              >
+                {webcamStream && <UserVideo />}
+              </div>
+
+              <div
+                className={callAccepted ? `user-video` : `partner-video`}
+                // ref={partnerBox}
+                onTouchMove={(e) => {
+                  handleMovePartnerVideo(e);
+                }}
+              >
+                {callAccepted && <PartnerVideo />}
+                {callAccepted && (
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger end-call"
+                    onClick={closeAndEndCall}
+                  >
+                    END CALL
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="users-call-view">
+              <div className="users">
+                <h3>Online Users:</h3>
+                {usersList}
+                <h5>Username: {username}</h5>
+              </div>
+              {receivingCall && <IncomingCall />}
+              {awaitingResponse && <CallLoadingScreen />}
+              <ChangeUserName
+                usernameInput={usernameInput}
+                setUsernameInput={setUsernameInput}
+                handleSubmitUsername={handleSubmitUsername}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
